@@ -1,0 +1,88 @@
+# Below are 3 separate files that work together to run a Discord Bot that fetches API data from a website in order to determine multiple
+  given circumstances and uses that data to perform automated functions.
+
+#MAIN.PY FILE
+import bot
+
+if __name__ == '__main__':
+    bot.run_discord_bot()
+
+
+#RESPONSES.PY FILE
+import asyncio
+import bot
+
+
+def get_response(message: str) -> str:
+    p_message = message.lower()
+    # !time command
+    if p_message == '!time':
+        async def on_message(mm):
+            if mm.author == bot.client.user:
+                return
+
+            if mm.content.startswith('!time'):
+                cetus_time = await bot.get_cetus_time()
+                await mm.channel.send(f"The current Cetus time is: {cetus_time}")
+
+#BOT.PY FILE
+import discord
+import responses
+import asyncio
+import requests
+
+
+def run_discord_bot():
+    TOKEN = 'DISCORD_BOT_TOKEN'
+    intents = discord.Intents.default()
+    intents.message_content = True
+    client = discord.Client(intents=intents)
+
+    async def send_message(message, user_message, is_private):
+        try:
+            response = responses.get_response(user_message)
+            await message.author.send(response) if is_private else await message.channel.send(response)
+
+        except Exception as e:
+            print(e)
+
+    # Warframe API endpoint for Cetus time
+    CETUS_TIME_ENDPOINT = 'https://api.warframestat.us/pc/cetusCycle'
+
+    # Function to fetch Cetus time
+    async def get_cetus_time():
+        response = requests.get(CETUS_TIME_ENDPOINT)
+        data = response.json()
+        return data['timeOfDay']
+
+    # Function to check if it's nighttime in Cetus
+    async def check_cetus_nighttime():
+        cetus_time = await get_cetus_time()
+        if cetus_time == 'night':
+            channel = client.get_channel(CHANNEL_ID)  # Replace YOUR_CHANNEL_ID with your Discord channel ID
+            await channel.send('@everyone Cetus nighttime!')
+
+    async def background_task():
+        await client.wait_until_ready()
+        while not client.is_closed():
+            await check_cetus_nighttime()
+            await asyncio.sleep(60)
+
+    @client.event
+    async def on_ready():
+        print('Lotus is now running!')
+
+    @client.event
+    async def on_message(message):
+        if message.author == client.user:
+            return
+
+        username = str(message.author)
+        user_message = str(message.content)
+        channel = str(message.channel)
+
+        print(f'{username} said: "{user_message}"({channel})')
+
+    client.run(TOKEN)
+
+    client.loop.create_task(background_task())
