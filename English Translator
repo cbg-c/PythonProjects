@@ -1,0 +1,47 @@
+# This project uses the Translator package to accept user input to pick from 4 languages to translate to, while also displaying error messages
+  and suggestions for which languages the bot uses.
+
+from translate import Translator
+
+#list of languages available
+Japan = Translator(to_lang='ja')
+Kor = Translator(to_lang='ko')
+Punj = Translator(to_lang='pa')
+Span = Translator(to_lang='es')
+
+def translating():
+    which_lang = input('Which language do you want to translate to: ')
+    while True:
+        if which_lang in ['japanese', 'Japanese']:
+            textJa = input('Input text to be translated to Japanese or type cl to change language: ')
+            if textJa == 'cl':
+                return translating()
+            translationJa = Japan.translate(textJa)
+            print('Translated:', translationJa)
+        
+        elif which_lang in ['korean', 'Korean']:
+            textKo = input('Input text to be translated to Korean or type cl to change language: ')
+            if textKo == 'cl':
+                return translating()
+            translationKo = Kor.translate(textKo)
+            print('Translated:', translationKo)
+        
+        elif which_lang in ['punjabi', 'Punjabi']:
+            textPa = input('Input text to be translated to Punjabi or type cl to change language: ')
+            if textPa == 'cl':
+                return translating()
+            translationPa = Punj.translate(textPa)
+            print('Translated:', translationPa)
+        
+        elif which_lang in ['spanish', 'Spanish']:
+            textEs = input('Input text to be translated to Spanish or type cl to change language: ')
+            if textEs == 'cl':
+                return translating()
+            translationEs = Span.translate(textEs)
+            print('Translated:', translationEs)
+        
+        else:
+            print('Sorry, I dont know that language try: japanese, korean, punjabi, or spanish')
+            return translating()
+
+translating()
