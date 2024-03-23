@@ -1,0 +1,27 @@
+# Using the PIL package we are able to manipulate images in many ways, in this simple project I used it to Resize, Crop, turn the image into a thumbnail,
+  and also turn the image Black and White.
+
+from PIL import Image, ImageFilter
+
+img = Image.open('./Pokedex/pikachu.jpg')
+filtered_img = img.filter(ImageFilter.BLUR)
+filtered_img.save("blur.png", 'png')
+# Blurring and saving as png 
+
+
+# Black and White.
+img_L = img.convert('L')
+
+
+# Resize.
+resize = filtered_img.resize((300, 300))
+resize.save("grey.png", 'png')
+
+# Crop.
+box = (100, 100, 400, 400)
+region = filtered_img.crop(box)
+region.save("grey.png", 'png')
+
+# Thumbnail tries to keep aspect ratio.
+img.thumbnail((400, 400))
+img.save('thumbnail.jpg')
